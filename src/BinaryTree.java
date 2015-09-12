@@ -2,6 +2,9 @@ import apple.laf.JRSUIUtils;
 
 import javax.annotation.PreDestroy;
 import java.util.*;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.RecursiveTask;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -18,7 +21,6 @@ public class BinaryTree<T> {
     private Node<T> root = null;
     private int count = 0;
     private Comparator<T> comparator;
-    private Node<T> bstTempNode;
 
     /**
      * Instantiates a new Binary tree.
@@ -70,58 +72,19 @@ public class BinaryTree<T> {
         return true;
     }
 
-
     /**
-     * Binary search non global.
+     * Binary search
      *
      * @param item the item
      * @return the boolean
      */
-    public boolean binarySearchNonGlobal(T item){
-        Node<T> tempNode = root;
-        while(true){
-            if(comparator.compare(item,tempNode.getData()) == 0){
-                return true;
-            }else if(comparator.compare(item,tempNode.getData()) == -1){
-                tempNode = tempNode.getN1();
-            }else{
-                tempNode = tempNode.getN2();
-            }
+    public boolean binarySearch(T item){
+        for(Node<T> tempNode = root; tempNode!=null;tempNode = comparator.compare( item, tempNode.getData() ) == -1? tempNode.getN1() :tempNode.getN2()){
             if(tempNode == null)
                 break;
-        }
-        return false;
-    }
-
-    /**
-     * Binary search for.
-     *
-     * @param item the item
-     * @return the boolean
-     */
-    public boolean binarySearchFor(T item){
-        bstTempNode = root;
-        Boolean nodeFound;
-        while((nodeFound = binarySearch(item))!=null){
-            if(nodeFound == true) {
-                bstTempNode = null;
+            if(comparator.compare( item ,tempNode.getData() ) == 0){
                 return true;
             }
-        }
-        bstTempNode = null;
-        return false;
-    }
-
-    private Boolean binarySearch(T item){
-       if(bstTempNode == null)
-           return null;
-
-        if(comparator.compare(item,bstTempNode.getData()) == 0) {
-            return true;
-        }else if(comparator.compare(item,bstTempNode.getData()) == 1){
-            bstTempNode =  bstTempNode.getN2();
-        }else{
-            bstTempNode =  bstTempNode.getN1();
         }
         return false;
     }
@@ -299,6 +262,14 @@ public class BinaryTree<T> {
         return Math.abs((getHeight(root.getN1()) - getHeight(root.getN2())))<= 1;
     }
 
+    public boolean parrallelIsBalanced(){
+        if(root == null)
+            return false;
+
+        ForkJoinPool forkJoinPool = new ForkJoinPool();
+        return  (boolean) forkJoinPool.invoke(new ParrallelIsBalanced(root));
+    }
+
     /**
      * Get height.
      *
@@ -313,7 +284,7 @@ public class BinaryTree<T> {
      *
      * @return an array made of all elements in the tree
      */
-    private int getHeight(Node<T> node) {
+    public int getHeight(Node<?> node) {
 
         if (node == null)
         {
@@ -363,4 +334,31 @@ public class BinaryTree<T> {
         return clone;
     }
 
+    private class ParrallelIsBalanced extends RecursiveTask{
+        private Node<?> nodeToProcess;
+        private int height;
+        boolean is = false;
+
+        public ParrallelIsBalanced(Node<?> node) {
+            nodeToProcess = node;
+        }
+
+        private ParrallelIsBalanced(Node<?> node,boolean is) {
+            nodeToProcess = node;
+            this.is = is;
+        }
+
+        @Override
+        protected Object compute() {
+            if(is == false) {
+                List<ParrallelIsBalanced> col = new ArrayList<>();
+                col.add(new ParrallelIsBalanced(nodeToProcess.getN1(), true));
+                col.add(new ParrallelIsBalanced(nodeToProcess.getN2(), true));
+                Collection<T> ret = invokeAll((Collection)col);
+                return Math.abs(col.get(0).height - col.get(1).height)<= 1;
+            }
+                this.height = getHeight(nodeToProcess);
+                return height;
+        }
+    }
 }

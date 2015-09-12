@@ -18,18 +18,22 @@ public class BSTMain {
         BinaryTree<Integer> bt = new BinaryTree<>(comp);
 
 
-        //Create a balanced binary tree
-        bt.addElement(50);
-        bt.addElement(17);
-        bt.addElement(12);
-        bt.addElement(23);
-        bt.addElement(9);
-        bt.addElement(14);
-        bt.addElement(19);
-        bt.addElement(72);
-        bt.addElement(54);
-        bt.addElement(76);
-        bt.addElement(67);
+        Random r = new Random(System.currentTimeMillis());
+        for(int i = 0; i < 10000; i++){
+            bt.addElement(r.nextInt(10000));
+        }
+
+
+        System.out.println("Is this tree balanced?: ");
+        System.out.println(bt.isBalanced());
+        System.out.println();
+
+        System.out.println("find out if this tree is balanced using fork-join parallelism (splits the left tree and right tree and combines results)");
+        System.out.println(bt.parrallelIsBalanced());
+        System.out.println();
+
+        System.out.println("The height of this tree is..");
+        System.out.println(bt.getHeight());
 
         System.out.println("Printing out all elements via tail recursion");
         //Print the elements via tail recursion.
@@ -38,11 +42,8 @@ public class BSTMain {
 
         //Search for an item in the tree using the comparator
         System.out.println("searching binary tree for 7, found? :");
-        System.out.println(bt.binarySearchNonGlobal(7)); //true for the set of integers currently in the tree
+        System.out.println(bt.binarySearch(7)); //true for the set of integers currently in the tree
 
-        System.out.println("searching binary tree for 5, found?: ");
-        //Search for an item in the tree using a global node (not thread safe)
-        System.out.println(bt.binarySearchFor(5)); //false for the set of numbers currently in the tree
 
         System.out.println("Printing number of elements in the binary tree:");
         //Returns the number of nodes in the tree
@@ -108,11 +109,6 @@ public class BSTMain {
         bt.traverseBinaryTreeTailRecursion();
         System.out.println();
 
-        System.out.println("Is this tree balanced?: ");
-        System.out.println(bt.isBalanced());
-        System.out.println();
-        System.out.println("The height of this tree is..");
-        System.out.println(bt.getHeight());
 
         System.out.println();
         System.out.println("Create a copy of the tree structure without the container");
