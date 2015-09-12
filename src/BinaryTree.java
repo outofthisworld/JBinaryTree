@@ -1,11 +1,6 @@
-import apple.laf.JRSUIUtils;
-
-import javax.annotation.PreDestroy;
 import java.util.*;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.RecursiveTask;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
@@ -15,7 +10,7 @@ import java.util.function.Predicate;
  * return the size of the binary tree
  *
  * This class is not intended for use by multiple threads.
- * @param <T>         the type parameter
+ * @param <T>          the type parameter
  */
 public class BinaryTree<T> {
     private Node<T> root = null;
@@ -112,6 +107,11 @@ public class BinaryTree<T> {
         }
     }
 
+    /**
+     * Apply over tree and reorder.
+     *
+     * @param treeFunc the tree func
+     */
     public void applyOverTreeAndReorder(TreeFunc<T> treeFunc) {
         if (root == null)
             return;
@@ -262,12 +262,17 @@ public class BinaryTree<T> {
         return Math.abs((getHeight(root.getN1()) - getHeight(root.getN2())))<= 1;
     }
 
-    public boolean parrallelIsBalanced(){
+    /**
+     * Parallel is balanced. Determines is the tree is balanced using fork-join.
+     *
+     * @return the boolean
+     */
+    public boolean parallelIsBalanced(){
         if(root == null)
             return false;
 
         ForkJoinPool forkJoinPool = new ForkJoinPool();
-        return  (boolean) forkJoinPool.invoke(new ParrallelIsBalanced(root));
+        return  (boolean) forkJoinPool.invoke(new ParallelIsBalanced(root));
     }
 
     /**
@@ -282,6 +287,7 @@ public class BinaryTree<T> {
     /**
      * Traverse the tree using tail recursion
      *
+     * @param node the node
      * @return an array made of all elements in the tree
      */
     public int getHeight(Node<?> node) {
@@ -334,16 +340,24 @@ public class BinaryTree<T> {
         return clone;
     }
 
-    private class ParrallelIsBalanced extends RecursiveTask{
+    private class ParallelIsBalanced extends RecursiveTask{
         private Node<?> nodeToProcess;
         private int height;
+        /**
+         * The Is.
+         */
         boolean is = false;
 
-        public ParrallelIsBalanced(Node<?> node) {
+        /**
+         * Instantiates a new Parrallel is balanced.
+         *
+         * @param node the node
+         */
+        public ParallelIsBalanced(Node<?> node) {
             nodeToProcess = node;
         }
 
-        private ParrallelIsBalanced(Node<?> node,boolean is) {
+        private ParallelIsBalanced(Node<?> node,boolean is) {
             nodeToProcess = node;
             this.is = is;
         }
@@ -351,9 +365,9 @@ public class BinaryTree<T> {
         @Override
         protected Object compute() {
             if(is == false) {
-                List<ParrallelIsBalanced> col = new ArrayList<>();
-                col.add(new ParrallelIsBalanced(nodeToProcess.getN1(), true));
-                col.add(new ParrallelIsBalanced(nodeToProcess.getN2(), true));
+                List<ParallelIsBalanced> col = new ArrayList<>();
+                col.add(new ParallelIsBalanced(nodeToProcess.getN1(), true));
+                col.add(new ParallelIsBalanced(nodeToProcess.getN2(), true));
                 Collection<T> ret = invokeAll((Collection)col);
                 return Math.abs(col.get(0).height - col.get(1).height)<= 1;
             }

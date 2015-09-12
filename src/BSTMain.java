@@ -23,13 +23,12 @@ public class BSTMain {
             bt.addElement(r.nextInt(10000));
         }
 
-
         System.out.println("Is this tree balanced?: ");
         System.out.println(bt.isBalanced());
         System.out.println();
 
-        System.out.println("find out if this tree is balanced using fork-join parallelism (splits the left tree and right tree and combines results)");
-        System.out.println(bt.parrallelIsBalanced());
+        System.out.println("find out if this tree is balanced using fork-join parallelism");
+        System.out.println(bt.parallelIsBalanced());
         System.out.println();
 
         System.out.println("The height of this tree is..");
@@ -108,7 +107,6 @@ public class BSTMain {
         System.out.println("The new tree is: ");
         bt.traverseBinaryTreeTailRecursion();
         System.out.println();
-
 
         System.out.println();
         System.out.println("Create a copy of the tree structure without the container");
