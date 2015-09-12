@@ -149,6 +149,15 @@ public class BinaryTree<T> {
         }
     }
 
+    public void applyOverTreeAndReorder(TreeFunc<T> treeFunc) {
+        if (root == null)
+            return;
+
+        ArrayList<T> ar = binaryTreeToArrayList();
+        ar.sort(comparator);
+        root=null;
+        ar.stream().forEach(e->addElement(treeFunc.applyOver(e)));
+    }
 
     /**
      * Apply the specified function over all items in the tree.
@@ -353,4 +362,5 @@ public class BinaryTree<T> {
         }
         return clone;
     }
+
 }

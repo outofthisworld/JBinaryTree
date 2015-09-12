@@ -95,10 +95,35 @@ public class BSTMain {
         bt.traverseBinaryTreeTailRecursion();
         System.out.println();
 
+        System.out.println("Setting all elements back to normal:");
+        bt.applyOverTree(e->e/10,t->t%2==0);
+        //Print the elements
+        bt.traverseBinaryTreeTailRecursion();
+        System.out.println();
+
+        System.out.println("Now multiplying all elements by 10, but reordering the whole tree at the same time");
+        bt.applyOverTreeAndReorder(e->e*10);
+        //Print the elements
+        System.out.println("The new tree is: ");
+        bt.traverseBinaryTreeTailRecursion();
+        System.out.println();
+
         System.out.println("Is this tree balanced?: ");
         System.out.println(bt.isBalanced());
         System.out.println();
         System.out.println("The height of this tree is..");
         System.out.println(bt.getHeight());
+
+        System.out.println();
+        System.out.println("Create a copy of the tree structure without the container");
+        Node<Integer> b = bt.getRootNode();
+        System.out.println("Set the copies root element to 90");
+        b.setData(90);
+        System.out.println("Check that the root element is 90, root element = ");
+        System.out.println(b.getData());
+        System.out.println("Now check the binary trees root element to see if it changed:");
+        System.out.println(bt.getRootElement());
+        //This assertation should hold
+        assert b.getData() != bt.getRootElement();
     }
 }

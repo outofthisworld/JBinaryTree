@@ -16,7 +16,9 @@ public class Node<T> {
     protected Object clone() throws CloneNotSupportedException {
         Node<T> node = new Node<>();
         node.setData(this.data);
+        if(this.n1 != null)
         node.setN1((Node<T>)this.n1.clone());
+        if(this.n2 != null)
         node.setN2((Node<T>)this.n2.clone());
         return node;
     }
